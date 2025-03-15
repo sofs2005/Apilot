@@ -186,46 +186,6 @@ class Apilot(Plugin):
             reply = self.create_reply(ReplyType.TEXT, hitokoto)
             e_context['reply'] = reply
             e_context.action = EventAction.BREAK_PASS #事件结束，并跳过处理context默认逻辑
-            
-        if content.startswith("点歌"):
-            import requests
-            import os
-            import json
-            cont = content[2:].strip()
-            print('-*****----点歌-----*****-',cont)
-            url='https://www.hhlqilongzhu.cn/api/dg_mgmusic.php?gm='+cont+'&n=1'
-            headers = {'Content-Type': 'application/json'}
-            response = requests.get(url=url, headers=headers)
-            if response.json()['code']==200:
-                
-                # 音频文件链接
-                music_url=response.json()['music_url']
-                print('-*****----歌曲链接-----*****-',music_url)
-                # 发送 GET 请求下载文件
-                
-                mresponse = requests.get(music_url,stream=True)
-                music_name='music.mp3'
-                        # 构建保存路径（当前目录）
-                os.makedirs("/app/tmp", exist_ok=True)
-                music_path = os.path.join('/app/tmp', music_name)
-                # 检查请求是否成功
-                if mresponse.status_code == 200:
-                    print('音乐请求成功')
-                    # 保存文件
-                    with open(music_path, "wb") as file:
-                        for chunk in mresponse.iter_content(chunk_size=1024):
-                            file.write(chunk)
-                    print("音乐下载完毕",music_path)
-                else:
-                    print(f"下载失败，状态码：{mresponse.status_code}")
-                    # 获取文件名（假设 URL 中包含文件名）
-                    
-                reply_type = ReplyType.VOICE
-                print('-----点歌成功------',music_path)
-                reply = self.create_reply(reply_type,music_path)
-                e_context["reply"] = reply
-                e_context.action = EventAction.BREAK_PASS  # 事件结束，并跳过处理context的默认逻辑
-                return
 
         if content.startswith("快递"):
             # Extract the part after "快递"
