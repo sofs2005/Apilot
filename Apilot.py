@@ -13,6 +13,7 @@ from plugins import *
 from datetime import datetime, timedelta
 import time
 import os
+from requests_html import HTMLSession
 
 BASE_URL_VVHAN = "https://api.vvhan.com/api/"
 BASE_URL_ALAPI = "https://v2.alapi.cn/api/"
@@ -23,8 +24,8 @@ BASE_URL_ALAPI = "https://v2.alapi.cn/api/"
     desire_priority=88,
     hidden=False,
     desc="A plugin to handle specific keywords",
-    version="0.2",
-    author="vision",
+    version="1.0",
+    author="sofs2005",
 )
 class Apilot(Plugin):
     def __init__(self):
@@ -491,67 +492,73 @@ class Apilot(Plugin):
                 return self.handle_error(e, "早报获取失败")
 
     def download_image(self, image_url):
-        """
-        下载图片并返回BytesIO对象
-        """
+        """使用requests-html模拟浏览器下载图片"""
         try:
-            # 从URL中提取域名作为Referer
+            # 首先需要安装requests-html库
+            # pip install requests-html
+            from requests_html import HTMLSession
+            import random
+            import time
+            from urllib.parse import urlparse
+            
+            # 创建会话
+            session = HTMLSession()
+            
+            # 多种User-Agent随机选择
+            user_agents = [
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Safari/605.1.15",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0"
+            ]
+            
+            # 解析URL获取域名
             parsed_url = urlparse(image_url)
             base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
             
-            # 设置更全面的请求头
+            # 先访问首页获取cookies
+            logger.info(f"[早报] 先访问主域名: {base_url}")
             headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "Referer": base_url,
-                "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
-                "Accept-Encoding": "gzip, deflate, br",
+                "User-Agent": random.choice(user_agents),
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
                 "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
                 "Connection": "keep-alive",
-                "Cache-Control": "no-cache",
-                "Pragma": "no-cache"
+                "Upgrade-Insecure-Requests": "1"
+            }
+            session.get(base_url, headers=headers)
+            
+            # 随机延迟模拟人类行为
+            time.sleep(random.uniform(1, 2))
+            
+            # 访问图片URL
+            logger.info(f"[早报] 下载图片: {image_url}")
+            headers = {
+                "User-Agent": random.choice(user_agents),
+                "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+                "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+                "Referer": base_url,
+                "Connection": "keep-alive",
+                "Sec-Fetch-Dest": "image",
+                "Sec-Fetch-Mode": "no-cors",
+                "Sec-Fetch-Site": "same-origin",
+                "Pragma": "no-cache",
+                "Cache-Control": "no-cache"
             }
             
-            # 最多尝试3次
-            max_attempts = 3
-            attempts = 0
+            response = session.get(image_url, headers=headers, timeout=15)
             
-            while attempts < max_attempts:
-                try:
-                    attempts += 1
-                    # 下载图片
-                    logger.info(f"正在下载图片 {image_url}，第{attempts}次尝试")
-                    response = requests.get(image_url, headers=headers, timeout=10)
-                    
-                    # 检查请求是否成功
-                    response.raise_for_status()
-                    
-                    # 内容长度检查（确保不是空图片或错误页面）
-                    if len(response.content) < 100:  # 图片一般不会小于100字节
-                        logger.warning(f"下载的内容过小，可能不是有效图片: {len(response.content)} bytes")
-                        if attempts < max_attempts:
-                            continue
-                    
-                    # 创建 io.BytesIO 对象并返回
-                    img_io = io.BytesIO(response.content)
-                    img_io.seek(0)  # 将指针移动到开头
-                    
-                    logger.info(f"成功下载早报图片，大小: {len(response.content)/1024:.2f} KB")
-                    return img_io
-                    
-                except requests.exceptions.RequestException as e:
-                    logger.warning(f"尝试 {attempts}/{max_attempts} 失败: {e}")
-                    if attempts >= max_attempts:
-                        raise
-                    # 短暂延迟后重试
-                    time.sleep(1)
-            
-            # 如果所有尝试都失败，尝试备用API
-            return self._try_backup_apis(image_url)
+            if response.status_code == 200:
+                img_io = io.BytesIO(response.content)
+                img_io.seek(0)
+                logger.info(f"[早报] 图片下载成功: {len(response.content)/1024:.2f} KB")
+                return img_io
+            else:
+                logger.error(f"[早报] 请求失败，状态码: {response.status_code}")
+                return self._try_backup_apis(image_url)
             
         except Exception as e:
-            logger.error(f"下载图片失败: {e}")
+            logger.error(f"[早报] 模拟浏览器下载失败: {e}")
             return self._try_backup_apis(image_url)
-            
+
     def _try_backup_apis(self, original_url=None):
         """尝试从备用API获取早报图片"""
         try:
