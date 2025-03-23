@@ -16,7 +16,7 @@ import os
 from requests_html import HTMLSession
 
 BASE_URL_VVHAN = "https://api.vvhan.com/api/"
-BASE_URL_ALAPI = "https://v2.alapi.cn/api/"
+BASE_URL_ALAPI = "https://v3.alapi.cn/api/"
 
 
 @plugins.register(
