@@ -187,32 +187,6 @@ class Apilot(Plugin):
             e_context['reply'] = reply
             e_context.action = EventAction.BREAK_PASS #事件结束，并跳过处理context默认逻辑
 
-        if content.startswith("快递"):
-            # Extract the part after "快递"
-            tracking_number = content[2:].strip()
-
-            tracking_number = tracking_number.replace('：', ':')  # 替换可能出现的中文符号
-            # Check if alapi_token is available before calling the function
-            if not self.alapi_token:
-                self.handle_error("alapi_token not configured", "快递请求失败")
-                reply = self.create_reply(ReplyType.TEXT, "请先配置alapi的token")
-            else:
-                # Check if the tracking_number starts with "SF" for Shunfeng (顺丰) Express
-                if tracking_number.startswith("SF"):
-                    # Check if the user has included the last four digits of the phone number
-                    if ':' not in tracking_number:
-                        reply = self.create_reply(ReplyType.TEXT, "顺丰快递需要补充寄/收件人手机号后四位，格式：SF12345:0000")
-                        e_context["reply"] = reply
-                        e_context.action = EventAction.BREAK_PASS  # 事件结束，并跳过处理context的默认逻辑
-                        return  # End the function here
-
-                # Call query_express_info function with the extracted tracking_number and the alapi_token from config
-                content = self.query_express_info(self.alapi_token, tracking_number)
-                reply = self.create_reply(ReplyType.TEXT, content)
-            e_context["reply"] = reply
-            e_context.action = EventAction.BREAK_PASS  # 事件结束，并跳过处理context的默认逻辑
-            return
-
         horoscope_match = re.match(r'^([\u4e00-\u9fa5]{2}座)$', content)
         if horoscope_match:
             if content in ZODIAC_MAPPING:
@@ -274,7 +248,6 @@ class Apilot(Plugin):
         # 查询类
         help_text += "\n🔍 查询工具：\n"
         help_text += '  🌦️ 天气: 发送"城市+天气"查天气，如"北京天气"。\n'
-        help_text += '  📦 快递: 发送"快递+单号"查询快递状态。如"快递112345655"\n'
         help_text += '  🌌 星座: 发送星座名称查看今日运势，如"白羊座"。\n'
 
         return help_text
@@ -733,37 +706,6 @@ class Apilot(Plugin):
             )
             return final_output
 
-    def query_express_info(self, alapi_token, tracking_number, com="", order="asc"):
-        url = BASE_URL_ALAPI + "kd"
-        payload = f"token={alapi_token}&number={tracking_number}&com={com}&order={order}"
-        headers = {'Content-Type': "application/x-www-form-urlencoded"}
-
-        try:
-            response_json = self.make_request(url, method="POST", headers=headers, data=payload)
-
-            if not isinstance(response_json, dict) or response_json is None:
-                return f"查询失败：api响应为空"
-            code = response_json.get("code", None)
-            if code != 200:
-                msg = response_json.get("msg", "未知错误")
-                self.handle_error(msg, f"错误码{code}")
-                return f"查询失败，{msg}"
-            data = response_json.get("data", None)
-            formatted_result = [
-                f"快递编号：{data.get('nu')}",
-                f"快递公司：{data.get('com')}",
-                f"状态：{data.get('status_desc')}",
-                "状态信息："
-            ]
-            for info in data.get("info"):
-                time_str = info.get('time')[5:-3]
-                formatted_result.append(f"{time_str} - {info.get('status_desc')}\n    {info.get('content')}")
-
-            return "\n".join(formatted_result)
-
-        except Exception as e:
-            return self.handle_error(e, "快递查询失败")
-
     def get_weather(self, alapi_token, city_or_id: str, date: str, content):
         url = BASE_URL_ALAPI + 'tianqi'
         isFuture = date in ['明天', '后天', '七天', '7天']
@@ -819,26 +761,104 @@ class Apilot(Plugin):
                 if not city_or_id.isnumeric() and data['city'] not in content:  # 如果返回城市信息不是所查询的城市，重新输入
                     return "输入不规范，请输<国内城市+(今天|明天|后天|七天|7天)+天气>，比如 '广州天气'"
                 formatted_output = []
-                basic_info = (
+                # 重新组织和分类天气信息
+                # 1. 基本位置和时间信息
+                location_info = (
                     f"🏙️ 城市: {data['city']} ({data['province']})\n"
                     f"🕒 更新: {formatted_update_time}\n"
+                )
+                
+                # 2. 天气状况信息
+                weather_info = (
                     f"🌦️ 天气: {data['weather']}\n"
                     f"🌡️ 温度: ↓{data['min_temp']}℃| 现{data['temp']}℃| ↑{data['max_temp']}℃\n"
-                    f"🌬️ 风向: {data['wind']}\n"
-                    f"💦 湿度: {data['humidity']}\n"
-                    f"🌅 日出/日落: {data['sunrise']} / {data['sunset']}\n"
                 )
-                formatted_output.append(basic_info)
+                
+                # 3. 风力信息
+                wind_info = (
+                    f"🌬️ 风向: {data['wind']} | 风速: {data.get('wind_speed', 'N/A')} | 风力: {data.get('wind_power', 'N/A')}\n"
+                )
+                
+                # 4. 环境指标分开显示
+                humidity_info = f"💦 湿度: {data['humidity']}"
+                visibility_info = f"👁️ 能见度: {data.get('visibility', 'N/A')}" 
+                pressure_info = f"🔄 气压: {data.get('pressure', 'N/A')}"
+                
+                environment_info = f"{humidity_info} | {visibility_info} | {pressure_info}\n"
+                
+                # 5. 太阳信息
+                sun_info = f"🌅 日出/日落: {data['sunrise']} / {data['sunset']}\n"
+                
+                # 组合所有信息
+                formatted_output.append(location_info + weather_info + wind_info + environment_info + sun_info)
+
+                # 空气质量信息
+                if data.get('aqi'):
+                    aqi_data = data['aqi']
+                    air_level = aqi_data.get('air_level', '')
+                    level_emoji = '🟢'  # 默认良好
+                    if '轻度' in air_level:
+                        level_emoji = '🟡'
+                    elif '中度' in air_level:
+                        level_emoji = '🟠'
+                    elif '重度' in air_level:
+                        level_emoji = '🔴'
+                    elif '严重' in air_level:
+                        level_emoji = '🟣'
+                    
+                    aqi_info = "💨 空气质量： \n"
+                    aqi_info += (
+                        f"{level_emoji} 质量指数: {aqi_data.get('air', 'N/A')} ({aqi_data.get('air_level', 'N/A')})\n"
+                        f"😷 PM2.5: {aqi_data.get('pm25', 'N/A')} | PM10: {aqi_data.get('pm10', 'N/A')}\n"
+                        f"⚗️ CO: {aqi_data.get('co', 'N/A')} | NO₂: {aqi_data.get('no2', 'N/A')} | SO₂: {aqi_data.get('so2', 'N/A')} | O₃: {aqi_data.get('o3', 'N/A')}\n"
+                        f"💡 提示: {aqi_data.get('air_tips', 'N/A')}\n"
+                    )
+                    formatted_output.append(aqi_info)
 
                 # 天气指标 Weather indicators
                 weather_indicators = data.get('index')
                 if weather_indicators:
-                    indicators_info = '⚠️ 天气指标： \n\n'
+                    indicators_info = '⚠️ 天气指标： \n'
                     for weather_indicator in weather_indicators:
-                        indicators_info += (
-                            f"🔴 {weather_indicator['name']}:{weather_indicator['level']}\n"
-                            f"🔵 {weather_indicator['content']}\n\n"
-                        )
+                        # 根据指标类型选择合适的emoji
+                        indicator_type = weather_indicator['type']
+                        indicator_emoji = "🔍"  # 默认emoji
+                        
+                        if "diaoyu" in indicator_type:
+                            indicator_emoji = "🎣"  # 钓鱼指数
+                        elif "ganmao" in indicator_type:
+                            indicator_emoji = "🤧"  # 感冒指数
+                        elif "guoming" in indicator_type or "allergy" in indicator_type:
+                            indicator_emoji = "😷"  # 过敏指数
+                        elif "xiche" in indicator_type:
+                            indicator_emoji = "🚗"  # 洗车指数
+                        elif "yundong" in indicator_type:
+                            indicator_emoji = "🏃"  # 运动指数
+                        elif "ziwanxian" in indicator_type or "uv" in indicator_type:
+                            indicator_emoji = "☀️"  # 紫外线指数
+                        elif "chuanyi" in indicator_type:
+                            indicator_emoji = "👕"  # 穿衣指数
+                        elif "lvyou" in indicator_type:
+                            indicator_emoji = "🏖️"  # 旅游指数
+                        elif "daisan" in indicator_type:
+                            indicator_emoji = "☂️"  # 带伞指数
+                        
+                        # 根据指标等级选择颜色emoji
+                        level = weather_indicator['level']
+                        level_emoji = "⚪"  # 默认白色
+                        
+                        if any(keyword in level for keyword in ["适宜", "良好", "最弱", "不需要", "不易"]):
+                            level_emoji = "🟢"  # 绿色表示良好
+                        elif any(keyword in level for keyword in ["较适宜", "中等", "弱", "偏高"]):
+                            level_emoji = "🟡"  # 黄色表示中等
+                        elif any(keyword in level for keyword in ["较不宜", "较强", "偏高", "少量"]):
+                            level_emoji = "🟠"  # 橙色表示较差
+                        elif any(keyword in level for keyword in ["不宜", "很强", "不建议", "高发", "易发", "极强"]):
+                            level_emoji = "🔴"  # 红色表示不佳
+                        
+                        # 合并到一行显示
+                        indicators_info += f"{indicator_emoji} {weather_indicator['name']} {level_emoji} {level}：{weather_indicator['content'][:60]}{'...' if len(weather_indicator['content']) > 60 else ''}\n\n"
+                    
                     formatted_output.append(indicators_info)
 
 
