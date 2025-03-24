@@ -18,6 +18,39 @@ from requests_html import HTMLSession
 BASE_URL_VVHAN = "https://api.vvhan.com/api/"
 BASE_URL_ALAPI = "https://v3.alapi.cn/api/"
 
+# 在类外部添加网易新闻类型映射
+NEWS_TYPE_MAPPING = {
+    '综合': '1',
+    '娱乐': '2',
+    '体育': '3',
+    '财经': '4',
+    '科技': '5',
+    '搞笑': '6',
+    '游戏': '7',
+    '读书': '8',
+    '生活': '9',
+    '直播': '10',
+    '历史': '11',
+    '国际': '12',
+    '影视': '13',
+    '国内足球': '14',
+    '国际足球': '15',
+    '篮球': '16',
+    '跑步': '17',
+    '手机': '18',
+    '电脑': '19',
+    '新能源': '20',
+    '设计': '21',
+    '地方': '22',
+    '健康': '23',
+    '酒文化': '24',
+    '教育': '25',
+    '育儿': '26',
+    '女性': '27',
+    '情感': '28',
+    '官方': '29',
+    '奇事': '30'
+}
 
 @plugins.register(
     name="Apilot",
@@ -55,6 +88,16 @@ class Apilot(Plugin):
             return
         content = e_context["context"].content.strip()
         logger.debug("[Apilot] on_handle_context. content: %s" % content)
+
+        # 添加网易新闻处理逻辑
+        news_match = re.match(r'^(.*?)新闻$', content)
+        if news_match or content == "新闻":
+            news_type = news_match.group(1) if news_match and news_match.group(1) else "综合"
+            news_content = self.get_netease_news(self.alapi_token, news_type)
+            reply = self.create_reply(ReplyType.TEXT, news_content)
+            e_context["reply"] = reply
+            e_context.action = EventAction.BREAK_PASS
+            return
 
         if content == "早报":
             news = self.get_morning_news(self.alapi_token, self.morning_news_text_enabled)
@@ -239,6 +282,7 @@ class Apilot(Plugin):
         help_text += '  🐟 摸鱼: 发送"摸鱼"获取摸鱼人日历。\n'
         help_text += '  🔥 热榜: 发送"xx热榜"查看支持的热榜。\n'
         help_text += '  🔥 八卦: 发送"八卦"获取明星八卦。\n'
+        help_text += '  📰 新闻: 发送"新闻"或"xx新闻"获取网易头条。\n'
         help_text += '  ☠️ 心灵毒鸡汤: 发送"毒鸡汤"获取心灵毒鸡汤。\n'
         help_text += '  ☃️ 历史上的今天: 发送"历史上的今天"or"历史上的今天x月x日"获取历史事件\n'
         help_text += '  🐕‍🦺 舔狗日记: 发送"舔狗"获取舔狗日记\n'
@@ -1101,6 +1145,79 @@ class Apilot(Plugin):
                 return hstp_pic_url
         logger.error(f"黑丝图片获取失败，错误信息：{hstp_info}")
         return "获取图片失败，请稍后再试"
+
+    # 添加获取网易新闻的方法
+    def get_netease_news(self, alapi_token, news_type="综合"):
+        url = BASE_URL_ALAPI + "new/toutiao"
+        
+        # 根据新闻类型获取对应的type值
+        type_value = NEWS_TYPE_MAPPING.get(news_type, '1')  # 默认为综合
+        
+        payload = {
+            "token": alapi_token,
+            "type": type_value,
+            "page": 1,
+            "limit": 10  # 限制返回10条新闻
+        }
+        
+        headers = {"Content-Type": "application/json"}
+        
+        try:
+            news_data = self.make_request(url, method="POST", headers=headers, json_data=payload)
+            
+            if isinstance(news_data, dict) and news_data.get('code') == 200:
+                news_list = news_data['data']
+                
+                # 准备格式化输出
+                now = datetime.now()
+                formatted_time = now.strftime("%Y-%m-%d %H:%M")
+                format_output = [f"📰 网易{news_type}新闻 ({formatted_time})\n"]
+                
+                # 添加新闻列表
+                for idx, news in enumerate(news_list, 1):
+                    # 格式化时间
+                    news_time = news.get('time', '')
+                    if news_time:
+                        try:
+                            dt = datetime.strptime(news_time, "%Y-%m-%d %H:%M:%S")
+                            news_time = dt.strftime("%m-%d %H:%M")
+                        except:
+                            pass
+                    
+                    # 优化输出格式
+                    news_title = news.get('title', '无标题')
+                    news_source = news.get('source', '未知来源')
+                    
+                    news_item = (
+                        f"📌 {idx}. {news_title}\n"
+                        f"   📰 来源: {news_source}  ⏰ {news_time}\n"
+                    )
+                    
+                    # 如果有摘要，添加摘要
+                    news_digest = news.get('digest', '')
+                    if news_digest and len(news_digest) > 0:
+                        # 限制摘要长度
+                        if len(news_digest) > 50:
+                            news_digest = news_digest[:47] + "..."
+                        news_item += f"   💬 {news_digest}\n"
+                    
+                    # 添加链接
+                    news_url = news.get('m_url', '')
+                    if news_url:
+                        news_item += f"   🔗 {news_url}\n"
+                    
+                    format_output.append(news_item)
+                
+                # 添加提示信息
+                supported_types = "、".join(list(NEWS_TYPE_MAPPING.keys())[:10]) + "等"
+                format_output.append(f"\n💡 发送\"XX新闻\"获取特定类型新闻，如：{supported_types}")
+                
+                return "\n".join(format_output)
+            else:
+                return self.handle_error(news_data, "新闻获取失败，请检查token是否有效")
+                
+        except Exception as e:
+            return self.handle_error(e, "获取新闻失败，请稍后再试")
 
 
 
