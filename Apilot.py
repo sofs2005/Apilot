@@ -226,7 +226,7 @@ class Apilot(Plugin):
             return
 
     def get_help_text(self, verbose=False, **kwargs):
-        short_help_text = " 发送特定指令以获取早报、热榜、查询天气、星座运势、快递信息等！"
+        short_help_text = " 发送特定指令以获取早报、热榜、查询天气、星座运势等！"
 
         if not verbose:
             return short_help_text
@@ -310,34 +310,64 @@ class Apilot(Plugin):
         try:
             history_event_data = self.make_request(url, method="POST", headers=headers, json_data=payload)
             if isinstance(history_event_data, dict) and history_event_data.get('code') == 200:
-                format_output = ["【🎊历史上的今天🎊】\n"]
+                current_date = ""
+                if month and day:
+                    current_date = f"{month}月{day}日"
+                else:
+                    today = datetime.now()
+                    current_date = today.strftime("%m月%d日")
+                
+                format_output = [f"【📆 历史上的今天 {current_date} 📆】\n"]
                 data = history_event_data['data']
                 history_count = len(data)
-                output_count = random.randint(10, 20)
-                history_set = set()
-                circulate_count = 0
-                if history_count >= 20:
-                    while len(history_set) <= output_count:
-                        circulate_count += 1
-                        cur_index = random.randint(0, history_count - 1)
-                        if cur_index not in history_set:
-                            history_set.add(cur_index)
-                            history = (
-                                f"🟥事件:  {data[cur_index]['title']} \n"
-                                f"🟩日期:  {data[cur_index]['date']}\n"
-                                f"🟦详细内容: {data[cur_index]['desc']}\n\n"
-                            )
-                            format_output.append(history)
-                        if circulate_count >= 50:
-                            break
-                else:
-                    for event in data:
-                        history = (
-                            f"🟥事件:  {event['title']} \n"
-                            f"🟩日期:  {event['date']}\n"
-                            f"🟦详细内容: {event['desc']}\n\n"
-                        )
-                        format_output.append(history)
+                
+                # 随机选择历史事件
+                output_count = random.randint(6, 10)  # 随机选择6-10条事件
+                selected_indices = set()
+                
+                # 设置消息长度限制
+                total_length = len(format_output[0])
+                message_limit = 2000  # 设置消息长度限制（微信单条消息大约2000字左右）
+                
+                # 随机选择并添加事件，直到达到数量或长度限制
+                attempt_count = 0
+                while len(selected_indices) < min(output_count, history_count) and attempt_count < 50:
+                    attempt_count += 1
+                    idx = random.randint(0, history_count - 1)
+                    if idx in selected_indices:
+                        continue
+                    
+                    event = data[idx]
+                    # 提取年份显示为单独的标签
+                    year = event['date'].split('年')[0] if '年' in event['date'] else ""
+                    year_display = f"📅 {year}" if year else ""
+                    
+                    # 截断过长的描述
+                    desc = event['desc']
+                    if len(desc) > 60:  # 缩短描述长度
+                        desc = desc[:57] + "..."
+                    
+                    # 使用更美观的emoji和格式
+                    history = (
+                        f"🔹 事件 {len(selected_indices) + 1}: {event['title']}\n"
+                        f"   {year_display}  📍 {event['date']}\n"
+                        f"   📝 {desc}\n"
+                    )
+                    
+                    # 检查添加当前事件后消息是否会超出长度限制
+                    if total_length + len(history) + 50 > message_limit:  # 预留50字符给提示信息
+                        break
+                    
+                    selected_indices.add(idx)
+                    format_output.append(history)
+                    total_length += len(history)
+                
+                # 添加有多少事件未显示的提示
+                if history_count > len(selected_indices):
+                    remaining = history_count - len(selected_indices)
+                    format_output.append(f"\n还有 {remaining} 条历史事件未显示")
+                
+                format_output.append("\n💡 发送\"历史上的今天X月X日\"可查询特定日期")
                 return "\n".join(format_output)
 
             else:
