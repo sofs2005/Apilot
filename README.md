@@ -52,3 +52,10 @@
 
 <img src="img/热榜.png" width="600" >
 
+* 还有其他功能请自行查看代码
+
+## 打赏支持
+
+如果您觉得这个插件对您有帮助，欢迎扫描下方二维码进行打赏支持，让我能够持续改进和开发更多实用功能。
+
+![微信打赏码](https://github.com/sofs2005/difytask/raw/main/img/wx.png?raw=true)
