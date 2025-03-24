@@ -1159,13 +1159,15 @@ class Apilot(Plugin):
                         f"   📰 来源: {news_source}  ⏰ {news_time}\n"
                     )
                     
-                    # 如果有摘要，添加摘要
+                    # 如果有摘要，添加摘要，但要避免与标题重复
                     news_digest = news.get('digest', '')
                     if news_digest and len(news_digest) > 0:
-                        # 限制摘要长度
-                        if len(news_digest) > 50:
-                            news_digest = news_digest[:47] + "..."
-                        news_item += f"   💬 {news_digest}\n"
+                        # 检查摘要是否与标题相似或相同
+                        if news_digest not in news_title and news_title not in news_digest:
+                            # 限制摘要长度
+                            if len(news_digest) > 50:
+                                news_digest = news_digest[:47] + "..."
+                            news_item += f"   💬 {news_digest}\n"
                     
                     # 添加链接
                     news_url = news.get('m_url', '')
