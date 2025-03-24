@@ -23,7 +23,7 @@ BASE_URL_ALAPI = "https://v3.alapi.cn/api/"
     desire_priority=88,
     hidden=False,
     desc="A plugin to handle specific keywords",
-    version="1.1",
+    version="1.2",
     author="sofs2005",
 )
 class Apilot(Plugin):
