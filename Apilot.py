@@ -23,7 +23,7 @@ BASE_URL_ALAPI = "https://v3.alapi.cn/api/"
     desire_priority=88,
     hidden=False,
     desc="A plugin to handle specific keywords",
-    version="1.2",
+    version="1.3",
     author="sofs2005",
 )
 class Apilot(Plugin):
@@ -837,14 +837,18 @@ class Apilot(Plugin):
                     aqi_data = data['aqi']
                     air_level = aqi_data.get('air_level', '')
                     level_emoji = '🟢'  # 默认良好
-                    if '轻度' in air_level:
-                        level_emoji = '🟡'
+                    if '优' in air_level:
+                        level_emoji = '🟢'  # 绿色表示优
+                    elif '良' in air_level:
+                        level_emoji = '🔵'  # 蓝色表示良
+                    elif '轻度' in air_level:
+                        level_emoji = '🟡'  # 黄色表示轻度污染
                     elif '中度' in air_level:
-                        level_emoji = '🟠'
+                        level_emoji = '🟠'  # 橙色表示中度污染
                     elif '重度' in air_level:
-                        level_emoji = '🔴'
+                        level_emoji = '🔴'  # 红色表示重度污染
                     elif '严重' in air_level:
-                        level_emoji = '🟣'
+                        level_emoji = '🟣'  # 紫色表示严重污染
                     
                     aqi_info = "💨 空气质量： \n"
                     aqi_info += (
@@ -887,14 +891,91 @@ class Apilot(Plugin):
                         level = weather_indicator['level']
                         level_emoji = "⚪"  # 默认白色
                         
-                        if any(keyword in level for keyword in ["适宜", "良好", "最弱", "不需要", "不易"]):
-                            level_emoji = "🟢"  # 绿色表示良好
-                        elif any(keyword in level for keyword in ["较适宜", "中等", "弱", "偏高"]):
-                            level_emoji = "🟡"  # 黄色表示中等
-                        elif any(keyword in level for keyword in ["较不宜", "较强", "偏高", "少量"]):
-                            level_emoji = "🟠"  # 橙色表示较差
-                        elif any(keyword in level for keyword in ["不宜", "很强", "不建议", "高发", "易发", "极强"]):
-                            level_emoji = "🔴"  # 红色表示不佳
+                        # 根据指标类型选择特定的判断逻辑
+                        if "ziwanxian" in indicator_type or "uv" in indicator_type:  # 紫外线指数
+                            if any(keyword in level for keyword in ["弱", "最弱"]):
+                                level_emoji = "🟢"  # 绿色表示弱
+                            elif "中等" in level:
+                                level_emoji = "🟡"  # 黄色表示中等
+                            elif "强" in level and "很强" not in level and "极强" not in level:
+                                level_emoji = "🟠"  # 橙色表示强
+                            elif "很强" in level:
+                                level_emoji = "🔴"  # 红色表示很强
+                            elif "极强" in level:
+                                level_emoji = "🟣"  # 紫色表示极强
+                        elif "ganmao" in indicator_type:  # 感冒指数
+                            if any(keyword in level for keyword in ["少发", "不易发"]):
+                                level_emoji = "🟢"  # 绿色表示少发
+                            elif "较易发" in level:
+                                level_emoji = "🟡"  # 黄色表示较易发
+                            elif "易发" in level:
+                                level_emoji = "🔴"  # 红色表示易发
+                        elif "xiche" in indicator_type:  # 洗车指数
+                            if "适宜" in level and "不" not in level and "较" not in level:
+                                level_emoji = "🟢"  # 绿色表示适宜
+                            elif "较适宜" in level:
+                                level_emoji = "🟡"  # 黄色表示较适宜
+                            elif "不适宜" in level:
+                                level_emoji = "🔴"  # 红色表示不适宜
+                        elif "yundong" in indicator_type:  # 运动指数
+                            if "适宜" in level and "不" not in level and "较" not in level:
+                                level_emoji = "🟢"  # 绿色表示适宜
+                            elif "较适宜" in level:
+                                level_emoji = "🟡"  # 黄色表示较适宜
+                            elif "不适宜" in level:
+                                level_emoji = "🔴"  # 红色表示不适宜
+                        elif "chuanyi" in indicator_type:  # 穿衣指数
+                            if any(keyword in level for keyword in ["炎热", "短袖"]):
+                                level_emoji = "🔴"  # 红色表示炎热
+                            elif any(keyword in level for keyword in ["舒适", "薄外套"]):
+                                level_emoji = "🟢"  # 绿色表示舒适
+                            elif any(keyword in level for keyword in ["较冷", "毛衣", "夹克"]):
+                                level_emoji = "🟡"  # 黄色表示较冷
+                            elif any(keyword in level for keyword in ["寒冷", "棉衣", "羽绒服"]):
+                                level_emoji = "🔵"  # 蓝色表示寒冷
+                        elif "lvyou" in indicator_type:  # 旅游指数
+                            if "非常适宜" in level:
+                                level_emoji = "🟢"  # 绿色表示非常适宜
+                            elif "适宜" in level and "不" not in level:
+                                level_emoji = "🔵"  # 蓝色表示适宜
+                            elif "一般" in level:
+                                level_emoji = "🟡"  # 黄色表示一般
+                            elif "不适宜" in level:
+                                level_emoji = "🔴"  # 红色表示不适宜
+                        elif "diaoyu" in indicator_type:  # 钓鱼指数
+                            if "适宜" in level and "不" not in level and "较" not in level:
+                                level_emoji = "🟢"  # 绿色表示适宜
+                            elif "较适宜" in level:
+                                level_emoji = "🟡"  # 黄色表示较适宜
+                            elif "不适宜" in level:
+                                level_emoji = "🔴"  # 红色表示不适宜
+                        elif "guoming" in indicator_type or "allergy" in indicator_type:  # 过敏指数
+                            if any(keyword in level for keyword in ["不易过敏", "1级"]):
+                                level_emoji = "🟢"  # 绿色表示1级不易过敏
+                            elif any(keyword in level for keyword in ["过敏少发", "2级"]):
+                                level_emoji = "🔵"  # 蓝色表示2级过敏少发
+                            elif any(keyword in level for keyword in ["较易过敏", "3级"]):
+                                level_emoji = "🟡"  # 黄色表示3级较易过敏
+                            elif any(keyword in level for keyword in ["易过敏", "4级"]):
+                                level_emoji = "🟠"  # 橙色表示4级易过敏
+                            elif any(keyword in level for keyword in ["极易过敏", "5级"]):
+                                level_emoji = "🔴"  # 红色表示5级极易过敏
+                            # 兼容旧版本格式
+                            elif "低" in level:
+                                level_emoji = "🟢"  # 绿色表示低
+                            elif "中" in level:
+                                level_emoji = "🟡"  # 黄色表示中
+                            elif "高" in level:
+                                level_emoji = "🔴"  # 红色表示高
+                        else:  # 通用判断逻辑
+                            if any(keyword in level for keyword in ["适宜", "良好", "最弱", "不需要", "不易", "舒适"]):
+                                level_emoji = "🟢"  # 绿色表示良好
+                            elif any(keyword in level for keyword in ["较适宜", "中等", "弱", "偏高", "一般"]):
+                                level_emoji = "🟡"  # 黄色表示中等
+                            elif any(keyword in level for keyword in ["较不宜", "较强", "少量"]):
+                                level_emoji = "🟠"  # 橙色表示较差
+                            elif any(keyword in level for keyword in ["不宜", "很强", "不建议", "高发", "易发", "极强", "不适宜"]):
+                                level_emoji = "🔴"  # 红色表示不佳
                         
                         # 合并到一行显示
                         indicators_info += f"{indicator_emoji} {weather_indicator['name']} {level_emoji} {level}：{weather_indicator['content'][:60]}{'...' if len(weather_indicator['content']) > 60 else ''}\n\n"
