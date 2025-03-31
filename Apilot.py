@@ -23,7 +23,7 @@ BASE_URL_ALAPI = "https://v3.alapi.cn/api/"
     desire_priority=88,
     hidden=False,
     desc="A plugin to handle specific keywords",
-    version="1.3",
+    version="1.4",
     author="sofs2005",
 )
 class Apilot(Plugin):
@@ -978,10 +978,9 @@ class Apilot(Plugin):
                                 level_emoji = "🔴"  # 红色表示不佳
                         
                         # 合并到一行显示
-                        indicators_info += f"{indicator_emoji} {weather_indicator['name']} {level_emoji} {level}：{weather_indicator['content'][:60]}{'...' if len(weather_indicator['content']) > 60 else ''}\n\n"
+                        indicators_info += f"{indicator_emoji} {weather_indicator['name']} {level_emoji} {level}：{weather_indicator['content'][:60]}{'...' if len(weather_indicator['content']) > 60 else ''}\n"
                     
                     formatted_output.append(indicators_info)
-
 
                 # Next 7 hours weather
                 ten_hours_later = dt_object + timedelta(hours=10)
@@ -999,14 +998,33 @@ class Apilot(Plugin):
 
                 # Alarm Info
                 if data.get('alarm'):
+                    # 添加空行分隔
+                    formatted_output.append("")
                     alarm_info = "⚠️ 预警信息:\n"
                     for alarm in data['alarm']:
+                        # 根据预警等级选择合适的emoji
+                        level_emoji = "⚠️"
+                        level = alarm['level']
+                        if "红色" in level:
+                            level_emoji = "🔴"
+                        elif "橙色" in level:
+                            level_emoji = "🟠"
+                        elif "黄色" in level:
+                            level_emoji = "🟡"
+                        elif "蓝色" in level:
+                            level_emoji = "🔵"
+                        
+                        # 处理内容中可能存在的HTML标签
+                        tips = alarm['tips'].replace('<br>', '\n        ').replace('<br/>', '\n        ')
+                        
+                        # 构建更清晰的预警信息格式
                         alarm_info += (
-                            f"🔴 标题: {alarm['title']}\n"
-                            f"🟠 等级: {alarm['level']}\n"
-                            f"🟡 类型: {alarm['type']}\n"
-                            f"🟢 提示: {alarm['tips']}\n"
-                            f"🔵 内容: {alarm['content']}\n\n"
+                            f"{level_emoji} {alarm['type']}{level}预警: {alarm['title']}\n"
+                            f"⏰ 发布时间: {alarm.get('publish_time', '')}\n"
+                            f"📋 预警提示:\n"
+                            f"        {tips}\n"
+                            f"📢 详细内容:\n"
+                            f"        {alarm['content']}\n\n"
                         )
                     formatted_output.append(alarm_info)
 
