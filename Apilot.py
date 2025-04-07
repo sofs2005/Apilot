@@ -922,6 +922,8 @@ class Apilot(Plugin):
                                 level_emoji = "🟢"  # 绿色表示适宜
                             elif "较适宜" in level:
                                 level_emoji = "🟡"  # 黄色表示较适宜
+                            elif "不建议" in level:
+                                level_emoji = "🟠"  # 橙色表示不建议
                             elif "不适宜" in level:
                                 level_emoji = "🔴"  # 红色表示不适宜
                         elif "chuanyi" in indicator_type:  # 穿衣指数
