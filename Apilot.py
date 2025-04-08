@@ -914,16 +914,16 @@ class Apilot(Plugin):
                             if "适宜" in level and "不" not in level and "较" not in level:
                                 level_emoji = "🟢"  # 绿色表示适宜
                             elif "较适宜" in level:
-                                level_emoji = "🟡"  # 黄色表示较适宜
+                                level_emoji = "🔵"  # 蓝色表示较适宜
                             elif "不适宜" in level:
                                 level_emoji = "🔴"  # 红色表示不适宜
                         elif "yundong" in indicator_type:  # 运动指数
                             if "适宜" in level and "不" not in level and "较" not in level:
                                 level_emoji = "🟢"  # 绿色表示适宜
                             elif "较适宜" in level:
-                                level_emoji = "🟡"  # 黄色表示较适宜
+                                level_emoji = "🔵"  # 蓝色表示较适宜
                             elif "不建议" in level:
-                                level_emoji = "🟠"  # 橙色表示不建议
+                                level_emoji = "🟡"  # 橙色表示不建议
                             elif "不适宜" in level:
                                 level_emoji = "🔴"  # 红色表示不适宜
                         elif "chuanyi" in indicator_type:  # 穿衣指数
@@ -948,7 +948,7 @@ class Apilot(Plugin):
                             if "适宜" in level and "不" not in level and "较" not in level:
                                 level_emoji = "🟢"  # 绿色表示适宜
                             elif "较适宜" in level:
-                                level_emoji = "🟡"  # 黄色表示较适宜
+                                level_emoji = "🔵"  # 蓝色表示较适宜
                             elif "不适宜" in level:
                                 level_emoji = "🔴"  # 红色表示不适宜
                         elif "guoming" in indicator_type or "allergy" in indicator_type:  # 过敏指数
