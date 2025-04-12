@@ -95,7 +95,7 @@ class Apilot(Plugin):
             e_context["reply"] = reply
             e_context.action = EventAction.BREAK_PASS  # 事件结束，并跳过处理context的默认逻辑
             return
-            
+
         if content == "白丝图片":
             bstp = self.get_mx_bstp()
             reply_type = ReplyType.IMAGE_URL if self.is_valid_url(bstp) else ReplyType.TEXT
@@ -119,7 +119,7 @@ class Apilot(Plugin):
             e_context["reply"] = reply
             e_context.action = EventAction.BREAK_PASS  # 事件结束，并跳过处理context的默认逻辑
             return
-        
+
         if content == "黑丝视频":
             hssp = self.get_hssp()
             reply_type = ReplyType.VIDEO_URL if self.is_valid_url(hssp) else ReplyType.TEXT
@@ -127,46 +127,46 @@ class Apilot(Plugin):
             e_context["reply"] = reply
             e_context.action = EventAction.BREAK_PASS  # 事件结束，并跳过处理context的默认逻辑
             return
-        
+
         if content == "cos视频":
             cos = self.get_cos()
             reply_type = ReplyType.VIDEO_URL if self.is_valid_url(cos) else ReplyType.TEXT
             reply = self.create_reply(reply_type, cos)
             e_context["reply"] = reply
             e_context.action = EventAction.BREAK_PASS  # 事件结束，并跳过处理context的默认逻辑
-            return        
-        
+            return
+
         if content == "吊带视频":
             ddsp = self.get_ddsp()
             reply_type = ReplyType.VIDEO_URL if self.is_valid_url(ddsp) else ReplyType.TEXT
             reply = self.create_reply(reply_type, ddsp)
             e_context["reply"] = reply
             e_context.action = EventAction.BREAK_PASS  # 事件结束，并跳过处理context的默认逻辑
-            return 
-                  
+            return
+
         if content == "JK视频":
             jksp = self.get_jksp()
             reply_type = ReplyType.VIDEO_URL if self.is_valid_url(jksp) else ReplyType.TEXT
             reply = self.create_reply(reply_type, jksp)
             e_context["reply"] = reply
             e_context.action = EventAction.BREAK_PASS  # 事件结束，并跳过处理context的默认逻辑
-            return    
-                
+            return
+
         if content == "萝莉视频":
             llsp = self.get_llsp()
             reply_type = ReplyType.VIDEO_URL if self.is_valid_url(llsp) else ReplyType.TEXT
             reply = self.create_reply(reply_type, llsp)
             e_context["reply"] = reply
             e_context.action = EventAction.BREAK_PASS  # 事件结束，并跳过处理context的默认逻辑
-            return                 
-        
+            return
+
         if content == "小姐姐视频":
             xjjsp = self.get_xjjsp()
             reply_type = ReplyType.VIDEO_URL if self.is_valid_url(xjjsp) else ReplyType.TEXT
             reply = self.create_reply(reply_type, xjjsp)
             e_context["reply"] = reply
             e_context.action = EventAction.BREAK_PASS  # 事件结束，并跳过处理context的默认逻辑
-            return  
+            return
 
         if content == "毒鸡汤":
             dujitang = self.get_soul_dujijtang(self.alapi_token)
@@ -326,19 +326,19 @@ class Apilot(Plugin):
                 else:
                     today = datetime.now()
                     current_date = today.strftime("%m月%d日")
-                
+
                 format_output = [f"【📆 历史上的今天 {current_date} 📆】\n"]
                 data = history_event_data['data']
                 history_count = len(data)
-                
+
                 # 随机选择历史事件
                 output_count = random.randint(6, 10)  # 随机选择6-10条事件
                 selected_indices = set()
-                
+
                 # 设置消息长度限制
                 total_length = len(format_output[0])
                 message_limit = 2000  # 设置消息长度限制（微信单条消息大约2000字左右）
-                
+
                 # 随机选择并添加事件，直到达到数量或长度限制
                 attempt_count = 0
                 while len(selected_indices) < min(output_count, history_count) and attempt_count < 50:
@@ -346,37 +346,37 @@ class Apilot(Plugin):
                     idx = random.randint(0, history_count - 1)
                     if idx in selected_indices:
                         continue
-                    
+
                     event = data[idx]
                     # 提取年份显示为单独的标签
                     year = event['date'].split('年')[0] if '年' in event['date'] else ""
                     year_display = f"📅 {year}" if year else ""
-                    
+
                     # 截断过长的描述
                     desc = event['desc']
                     if len(desc) > 60:  # 缩短描述长度
                         desc = desc[:57] + "..."
-                    
+
                     # 使用更美观的emoji和格式
                     history = (
                         f"🔹 事件 {len(selected_indices) + 1}: {event['title']}\n"
                         f"   {year_display}  📍 {event['date']}\n"
                         f"   📝 {desc}\n"
                     )
-                    
+
                     # 检查添加当前事件后消息是否会超出长度限制
                     if total_length + len(history) + 50 > message_limit:  # 预留50字符给提示信息
                         break
-                    
+
                     selected_indices.add(idx)
                     format_output.append(history)
                     total_length += len(history)
-                
+
                 # 添加有多少事件未显示的提示
                 if history_count > len(selected_indices):
                     remaining = history_count - len(selected_indices)
                     format_output.append(f"\n还有 {remaining} 条历史事件未显示")
-                
+
                 format_output.append("\n💡 发送\"历史上的今天X月X日\"可查询特定日期")
                 return "\n".join(format_output)
 
@@ -473,21 +473,21 @@ class Apilot(Plugin):
             import random
             import time
             from urllib.parse import urlparse
-            
+
             # 创建会话
             session = HTMLSession()
-            
+
             # 多种User-Agent随机选择
             user_agents = [
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Safari/605.1.15",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0"
             ]
-            
+
             # 解析URL获取域名
             parsed_url = urlparse(image_url)
             base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
-            
+
             # 先访问首页获取cookies
             logger.info(f"[早报] 先访问主域名: {base_url}")
             headers = {
@@ -498,10 +498,10 @@ class Apilot(Plugin):
                 "Upgrade-Insecure-Requests": "1"
             }
             session.get(base_url, headers=headers)
-            
+
             # 随机延迟模拟人类行为
             time.sleep(random.uniform(1, 2))
-            
+
             # 访问图片URL
             logger.info(f"[早报] 下载图片: {image_url}")
             headers = {
@@ -516,9 +516,9 @@ class Apilot(Plugin):
                 "Pragma": "no-cache",
                 "Cache-Control": "no-cache"
             }
-            
+
             response = session.get(image_url, headers=headers, timeout=15)
-            
+
             if response.status_code == 200:
                 img_io = io.BytesIO(response.content)
                 img_io.seek(0)
@@ -527,7 +527,7 @@ class Apilot(Plugin):
             else:
                 logger.error(f"[早报] 请求失败，状态码: {response.status_code}")
                 return self._try_backup_apis(image_url)
-            
+
         except Exception as e:
             logger.error(f"[早报] 模拟浏览器下载失败: {e}")
             return self._try_backup_apis(image_url)
@@ -536,28 +536,28 @@ class Apilot(Plugin):
         """尝试从备用API获取早报图片"""
         try:
             logger.info("尝试使用备用API获取早报图片")
-            
+
             # 备用API列表
             backup_apis = [
                 "https://api.03c3.cn/api/zb",
                 "https://api.vvhan.com/api/60s",
                 "https://api.pearktrue.cn/api/60s/image"
             ]
-            
+
             for api_url in backup_apis:
                 try:
                     logger.info(f"尝试从备用API获取: {api_url}")
-                    
+
                     headers = {
                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                         "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
                     }
-                    
+
                     # 判断API是否返回JSON数据
                     if "api/zb" in api_url or "api/60s" in api_url:
                         response = requests.get(api_url, headers=headers, timeout=10)
                         response.raise_for_status()
-                        
+
                         # 检查是否返回JSON数据
                         if response.headers.get('Content-Type', '').startswith('application/json'):
                             data = response.json()
@@ -591,11 +591,11 @@ class Apilot(Plugin):
                         img_io.seek(0)
                         logger.info(f"成功从备用API {api_url} 获取早报图片")
                         return img_io
-                        
+
                 except Exception as e:
                     logger.warning(f"从备用API {api_url} 获取早报图片失败: {e}")
                     continue
-            
+
             # 如果所有备用API都失败
             logger.error("所有备用API均获取失败")
             return self.handle_error("所有图片来源均获取失败", "下载图片失败，请稍后再试")
@@ -784,14 +784,89 @@ class Apilot(Plugin):
                             continue
                         if date == '后天' and num != 2:
                             continue
-                        basic_info = [
-                            f"🕒 日期: {d['date']}",
-                            f"🌞 天气: 🌞{d['wea_day']}| 🌛{d['wea_night']}",
-                            f"🌡️ 温度: 🌞{d['temp_day']}℃| 🌛{d['temp_night']}℃",
-                            f"🌅 日出/日落: {d['sunrise']} / {d['sunset']}",
-                        ]
-                        for i in d['index']:
-                            basic_info.append(f"{i['name']}: {i['level']}")
+
+                        # 1. 基本位置和时间信息
+                        basic_info = [f"🕒 日期: {d['date']}"]
+
+                        # 2. 天气状况信息 - 与当天天气格式保持一致
+                        weather_info = f"🌦️ 天气: {d['wea_day']} | {d['wea_night']}"
+                        temp_info = f"🌡️ 温度: ↓{d['temp_night']}℃ | ↑{d['temp_day']}℃"
+                        basic_info.extend([weather_info, temp_info])
+
+                        # 3. 风力信息
+                        if 'win' in d:
+                            wind_speed = d.get('win_speed', 'N/A')
+                            wind_info = f"🌬️ 风向: {d['win']} | 风力: {wind_speed}"
+                            basic_info.append(wind_info)
+
+                        # 4. 日出日落信息
+                        sun_info = f"🌅 日出/日落: {d['sunrise']} / {d['sunset']}"
+                        basic_info.append(sun_info)
+
+                        # 5. 天气指标信息，使用更美观的格式
+                        if d['index']:
+                            basic_info.append("\n⚠️ 天气指标：")
+                            for i in d['index']:
+                                # 根据指标类型选择合适的emoji
+                                indicator_emoji = "🔍"  # 默认emoji
+                                indicator_type = i.get('type', '').lower()
+                                indicator_name = i['name']
+
+                                if "diaoyu" in indicator_type or "钓鱼" in indicator_name:
+                                    indicator_emoji = "🎣"  # 钓鱼指数
+                                elif "ganmao" in indicator_type or "感冒" in indicator_name:
+                                    indicator_emoji = "🤧"  # 感冒指数
+                                elif "guoming" in indicator_type or "allergy" in indicator_type or "过敏" in indicator_name:
+                                    indicator_emoji = "😷"  # 过敏指数
+                                elif "xiche" in indicator_type or "洗车" in indicator_name:
+                                    indicator_emoji = "🚗"  # 洗车指数
+                                elif "yundong" in indicator_type or "运动" in indicator_name:
+                                    indicator_emoji = "🏃"  # 运动指数
+                                elif "ziwanxian" in indicator_type or "uv" in indicator_type or "紫外线" in indicator_name:
+                                    indicator_emoji = "☀️"  # 紫外线指数
+                                elif "chuanyi" in indicator_type or "穿衣" in indicator_name:
+                                    indicator_emoji = "👕"  # 穿衣指数
+                                elif "lvyou" in indicator_type or "旅游" in indicator_name:
+                                    indicator_emoji = "🏖️"  # 旅游指数
+                                elif "daisan" in indicator_type or "带伞" in indicator_name:
+                                    indicator_emoji = "☂️"  # 带伞指数
+                                elif "空气污染" in indicator_name or "扩散" in indicator_name:
+                                    indicator_emoji = "💨"  # 空气污染扩散条件指数
+
+                                # 根据指标等级选择颜色emoji
+                                level = i['level']
+                                level_emoji = "⚪"  # 默认白色
+
+                                # 空气污染扩散条件指数的特殊判断
+                                if "空气污染" in indicator_name or "扩散" in indicator_name:
+                                    if any(keyword in level for keyword in ["优", "良好", "有利"]):
+                                        level_emoji = "🟢"  # 绿色表示优/良好
+                                    elif any(keyword in level for keyword in ["良", "一般", "中等"]):
+                                        level_emoji = "🔵"  # 蓝色表示良/一般
+                                    elif any(keyword in level for keyword in ["轻度", "较差"]):
+                                        level_emoji = "🟡"  # 黄色表示轻度污染
+                                    elif any(keyword in level for keyword in ["中度", "差"]):
+                                        level_emoji = "🟠"  # 橙色表示中度污染
+                                    elif any(keyword in level for keyword in ["重度", "很差"]):
+                                        level_emoji = "🔴"  # 红色表示重度污染
+                                    elif any(keyword in level for keyword in ["严重", "极差"]):
+                                        level_emoji = "🟣"  # 紫色表示严重污染
+                                # 其他指标的通用判断逻辑
+                                else:
+                                    if any(keyword in level for keyword in ["适宜", "良好", "最弱", "不需要", "不易", "舒适"]):
+                                        level_emoji = "🟢"  # 绿色表示良好
+                                    elif any(keyword in level for keyword in ["较适宜", "中等", "弱", "偏高", "一般"]):
+                                        level_emoji = "🟡"  # 黄色表示中等
+                                    elif any(keyword in level for keyword in ["较不宜", "较强", "少量"]):
+                                        level_emoji = "🟠"  # 橙色表示较差
+                                    elif any(keyword in level for keyword in ["不宜", "很强", "不建议", "高发", "易发", "极强", "不适宜"]):
+                                        level_emoji = "🔴"  # 红色表示不佳
+
+                                # 添加指标信息
+                                content = i.get('content', '')
+                                content_display = content[:60] + ('...' if len(content) > 60 else '')
+                                basic_info.append(f"{indicator_emoji} {i['name']} {level_emoji} {level} {content_display}")
+
                         formatted_output.append("\n".join(basic_info) + '\n')
                     return "\n".join(formatted_output)
                 update_time = data['update_time']
@@ -807,28 +882,28 @@ class Apilot(Plugin):
                     f"🏙️ 城市: {data['city']} ({data['province']})\n"
                     f"🕒 更新: {formatted_update_time}\n"
                 )
-                
+
                 # 2. 天气状况信息
                 weather_info = (
                     f"🌦️ 天气: {data['weather']}\n"
                     f"🌡️ 温度: ↓{data['min_temp']}℃| 现{data['temp']}℃| ↑{data['max_temp']}℃\n"
                 )
-                
+
                 # 3. 风力信息
                 wind_info = (
                     f"🌬️ 风向: {data['wind']} | 风速: {data.get('wind_speed', 'N/A')} | 风力: {data.get('wind_power', 'N/A')}\n"
                 )
-                
+
                 # 4. 环境指标分开显示
                 humidity_info = f"💦 湿度: {data['humidity']}"
-                visibility_info = f"👁️ 能见度: {data.get('visibility', 'N/A')}" 
+                visibility_info = f"👁️ 能见度: {data.get('visibility', 'N/A')}"
                 pressure_info = f"🔄 气压: {data.get('pressure', 'N/A')}"
-                
+
                 environment_info = f"{humidity_info} | {visibility_info} | {pressure_info}\n"
-                
+
                 # 5. 太阳信息
                 sun_info = f"🌅 日出/日落: {data['sunrise']} / {data['sunset']}\n"
-                
+
                 # 组合所有信息
                 formatted_output.append(location_info + weather_info + wind_info + environment_info + sun_info)
 
@@ -849,7 +924,7 @@ class Apilot(Plugin):
                         level_emoji = '🔴'  # 红色表示重度污染
                     elif '严重' in air_level:
                         level_emoji = '🟣'  # 紫色表示严重污染
-                    
+
                     aqi_info = "💨 空气质量： \n"
                     aqi_info += (
                         f"{level_emoji} 质量指数: {aqi_data.get('air', 'N/A')} ({aqi_data.get('air_level', 'N/A')})\n"
@@ -867,7 +942,7 @@ class Apilot(Plugin):
                         # 根据指标类型选择合适的emoji
                         indicator_type = weather_indicator['type']
                         indicator_emoji = "🔍"  # 默认emoji
-                        
+
                         if "diaoyu" in indicator_type:
                             indicator_emoji = "🎣"  # 钓鱼指数
                         elif "ganmao" in indicator_type:
@@ -886,11 +961,11 @@ class Apilot(Plugin):
                             indicator_emoji = "🏖️"  # 旅游指数
                         elif "daisan" in indicator_type:
                             indicator_emoji = "☂️"  # 带伞指数
-                        
+
                         # 根据指标等级选择颜色emoji
                         level = weather_indicator['level']
                         level_emoji = "⚪"  # 默认白色
-                        
+
                         # 根据指标类型选择特定的判断逻辑
                         if "ziwanxian" in indicator_type or "uv" in indicator_type:  # 紫外线指数
                             if any(keyword in level for keyword in ["弱", "最弱"]):
@@ -978,10 +1053,10 @@ class Apilot(Plugin):
                                 level_emoji = "🟠"  # 橙色表示较差
                             elif any(keyword in level for keyword in ["不宜", "很强", "不建议", "高发", "易发", "极强", "不适宜"]):
                                 level_emoji = "🔴"  # 红色表示不佳
-                        
+
                         # 合并到一行显示
                         indicators_info += f"{indicator_emoji} {weather_indicator['name']} {level_emoji} {level}：{weather_indicator['content'][:60]}{'...' if len(weather_indicator['content']) > 60 else ''}\n"
-                    
+
                     formatted_output.append(indicators_info)
 
                 # Next 7 hours weather
@@ -1015,10 +1090,10 @@ class Apilot(Plugin):
                             level_emoji = "🟡"
                         elif "蓝色" in level:
                             level_emoji = "🔵"
-                        
+
                         # 处理内容中可能存在的HTML标签
                         tips = alarm['tips'].replace('<br>', '\n        ').replace('<br/>', '\n        ')
-                        
+
                         # 构建更清晰的预警信息格式
                         alarm_info += (
                             f"{level_emoji} {alarm['type']}{level}预警: {alarm['title']}\n"
@@ -1109,7 +1184,7 @@ class Apilot(Plugin):
         if city_info:
             return city_info
         return None
-    
+
     def get_yzsp(self):
         url = "https://api.xlb.one/api/jpmt?type=json"
         payload = "format=json"
@@ -1120,7 +1195,7 @@ class Apilot(Plugin):
             if self.is_valid_image_url(yzsp_url):
                 return yzsp_url
         return "获取视频失败，请稍后再试"
-            
+
     def get_hssp(self):
         url = "https://api.yujn.cn/api/heisis.php?type=json"
         payload = "format=json"
@@ -1131,7 +1206,7 @@ class Apilot(Plugin):
             if self.is_valid_image_url(hssp_url):
                 return hssp_url
         return "获取视频失败，请稍后再试"
-            
+
     def get_cos(self):
         url = "https://api.xlb.one/api/COS?type=json"
         payload = "format=json"
@@ -1186,7 +1261,7 @@ class Apilot(Plugin):
             if self.is_valid_image_url(xjjsp_url):
                 return xjjsp_url
         return "获取视频失败，请稍后再试"
-        
+
     def get_mx_bstp(self):
         url = "https://api.xlb.one/api/baisi?type=json"
         payload = "format=json"
@@ -1199,7 +1274,7 @@ class Apilot(Plugin):
                 return bstp_pic_url
         logger.error(f"白丝图片获取失败，错误信息：{bstp_info}")
         return "获取图片失败，请稍后再试"
-        
+
     def get_mx_hstp(self):
         url = "https://api.xlb.one/api/heisi?type=json"
         payload = "format=json"
@@ -1216,30 +1291,30 @@ class Apilot(Plugin):
     # 添加获取网易新闻的方法
     def get_netease_news(self, alapi_token, news_type="综合"):
         url = BASE_URL_ALAPI + "new/toutiao"
-        
+
         # 根据新闻类型获取对应的type值
         type_value = NEWS_TYPE_MAPPING.get(news_type, '1')  # 默认为综合
-        
+
         payload = {
             "token": alapi_token,
             "type": type_value,
             "page": 1,
             "limit": 10  # 限制返回10条新闻
         }
-        
+
         headers = {"Content-Type": "application/json"}
-        
+
         try:
             news_data = self.make_request(url, method="POST", headers=headers, json_data=payload)
-            
+
             if isinstance(news_data, dict) and news_data.get('code') == 200:
                 news_list = news_data['data']
-                
+
                 # 准备格式化输出
                 now = datetime.now()
                 formatted_time = now.strftime("%Y-%m-%d %H:%M")
                 format_output = [f"📰 网易{news_type}新闻 ({formatted_time})\n"]
-                
+
                 # 添加新闻列表
                 for idx, news in enumerate(news_list, 1):
                     # 格式化时间
@@ -1250,16 +1325,16 @@ class Apilot(Plugin):
                             news_time = dt.strftime("%m-%d %H:%M")
                         except:
                             pass
-                    
+
                     # 优化输出格式
                     news_title = news.get('title', '无标题')
                     news_source = news.get('source', '未知来源')
-                    
+
                     news_item = (
                         f"📌 {idx}. {news_title}\n"
                         f"   📰 来源: {news_source}  ⏰ {news_time}\n"
                     )
-                    
+
                     # 如果有摘要，添加摘要，但要避免与标题重复
                     news_digest = news.get('digest', '')
                     if news_digest and len(news_digest) > 0:
@@ -1269,22 +1344,22 @@ class Apilot(Plugin):
                             if len(news_digest) > 50:
                                 news_digest = news_digest[:47] + "..."
                             news_item += f"   💬 {news_digest}\n"
-                    
+
                     # 添加链接
                     news_url = news.get('m_url', '')
                     if news_url:
                         news_item += f"   🔗 {news_url}\n"
-                    
+
                     format_output.append(news_item)
-                
+
                 # 添加提示信息
                 supported_types = "、".join(list(NEWS_TYPE_MAPPING.keys())[:10]) + "等"
                 format_output.append(f"\n💡 发送\"XX新闻\"获取特定类型新闻，如：{supported_types}")
-                
+
                 return "\n".join(format_output)
             else:
                 return self.handle_error(news_data, "新闻获取失败，请检查token是否有效")
-                
+
         except Exception as e:
             return self.handle_error(e, "获取新闻失败，请稍后再试")
 
