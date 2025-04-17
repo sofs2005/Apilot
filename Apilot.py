@@ -979,8 +979,10 @@ class Apilot(Plugin):
                             elif "极强" in level:
                                 level_emoji = "🟣"  # 紫色表示极强
                         elif "ganmao" in indicator_type:  # 感冒指数
-                            if any(keyword in level for keyword in ["少发", "不易发"]):
-                                level_emoji = "🟢"  # 绿色表示少发
+                            if "不易发" in level:
+                                level_emoji = "🟢"  # 绿色表示不易发
+                            elif "少发" in level:
+                                level_emoji = "�"  # 改用大蓝色方块表示少发
                             elif "较易发" in level:
                                 level_emoji = "🟡"  # 黄色表示较易发
                             elif "易发" in level:
