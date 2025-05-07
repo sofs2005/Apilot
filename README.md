@@ -1,61 +1,124 @@
-## 一个基于[ChatGPT-on-Wechat](https://github.com/zhayujie/chatgpt-on-wechat)项目的简单插件，直接调用一些实用的api接口！
-* [ALAPI接口](https://admin.alapi.cn/account/center)，部分接口免费，该插件没有兼容付费接口，比如热榜。
-* [韩小韩API接口站](https://api.vvhan.com/)，都是免费接口，但站长最近屏蔽了海外ip，出现问题的可以使用国内服务器，或者自行修改插件代码将接口换为alapi！
+# Apilot 插件
 
-### 安装
+## 简介
 
-使用管理员口令在线安装即可，参考这里去如何[认证管理员](https://www.wangpc.cc/aigc/chatgpt-on-wechat_plugin/)！
+Apilot 是一个基于 XXXBOT 的实用 API 接口调用插件，提供多种实用功能，如天气查询、星座运势、新闻资讯等。
 
+原DOW插件，由于不可抗力迁移至XXXBOT平台，保持原有功能。
+
+## 功能特点
+
+* 一言（Hitokoto）- 随机返回一句名言
+* 星座运势 - 查询星座每日运势
+* 天气查询 - 查询城市天气信息（支持今天、明天、后天、七天）
+* 新闻资讯 - 获取网易新闻头条
+* 毒鸡汤 - 获取心灵毒鸡汤
+* 舔狗日记 - 获取舔狗日记
+* 历史上的今天 - 查询历史上今天发生的事件
+* 早报 - 获取每日早报（支持图片版和文字版）
+* 摸鱼日历 - 获取摸鱼人日历
+* 摸鱼视频 - 获取摸鱼视频
+* 明星八卦 - 获取明星八卦
+* 热榜查询 - 查询各大平台热榜（微博、知乎、哔哩哔哩等）
+
+## 安装与配置
+
+1. 将插件文件夹放入 `plugins` 目录
+2. 编辑 `config.toml` 文件，配置以下参数：
+   * `enable` - 是否启用插件
+   * `alapi_token` - ALAPI 的 token，用于访问 API 服务
+   * `morning_news_text_enabled` - 是否启用早报文字版
+
+### 触发词配置
+
+在 `config.toml` 文件的 `[triggers]` 部分，可以自定义各功能的触发词：
+
+```toml
+[triggers]
+# 天气查询触发正则表达式
+weather_pattern = '^(?:(.{2,7}?)(?:市|县|区|镇)?|(\d{7,9}))(:?今天|明天|后天|7天|七天)?(?:的)?天气$'
+# 星座运势触发正则表达式
+horoscope_pattern = '^([\u4e00-\u9fa5]{2}座)$'
+# 新闻查询触发正则表达式
+news_pattern = '^(.*?)新闻$'
+# 历史上的今天触发正则表达式
+history_pattern = '^历史上的今天(\d+)月(\d+)日'
+# 热榜查询触发正则表达式
+hot_trend_pattern = '(.{1,6})热榜$'
+# 一言触发词
+hitokoto_trigger = '一言'
+# 毒鸡汤触发词
+dujitang_trigger = '毒鸡汤'
+# 舔狗日记触发词
+dog_diary_trigger = '舔狗'
+# 早报触发词
+morning_news_trigger = '早报'
+# 摸鱼触发词
+moyu_trigger = '摸鱼'
+# 摸鱼视频触发词
+moyu_video_trigger = '摸鱼视频'
+# 八卦触发词
+bagua_trigger = '八卦'
+
+[apis]
+# 八卦API地址
+bagua_api_url = "https://dayu.qqsuu.cn/mingxingbagua/apis.php"
+# 摸鱼视频API地址
+moyu_video_api_url = "https://api.vvhan.com/api/360wallpaper"
 ```
-#installp https://github.com/sofs2005/Apilot.git
-```
 
-安装成功后，根据提示使用`#scanp`命令来扫描新插件，再使用`#enablep Apilot`开启插件，参考下图
+## Token 申请
 
-<img src="img/安装.png" width="200" >
+* `alapi_token` 申请请访问 [ALAPI](https://admin.alapi.cn/account/center)
 
-### 配置
-直接安装不配置也可以使用一部分接口，部分接口(快递、天气)需要配置alapi的token。
+## 使用方法
 
-* 服务器部署：复制插件目录的`config.json.template`文件并重命名为`config.json`，
+* 发送 `一言` 获取随机名言
+* 发送星座名称（如 `白羊座`）获取星座运势
+* 发送 `城市名+天气`（如 `北京天气`）获取天气信息
+* 发送 `新闻` 或 `XX新闻`（如 `体育新闻`）获取新闻资讯
+* 发送 `毒鸡汤` 获取心灵毒鸡汤
+* 发送 `舔狗` 获取舔狗日记
+* 发送 `历史上的今天` 获取历史上的今天发生的事件
+* 发送 `历史上的今天X月X日` 获取特定日期的历史事件
+* 发送 `早报` 获取每日早报
+* 发送 `摸鱼` 获取摸鱼人日历
+* 发送 `摸鱼视频` 获取摸鱼视频
+* 发送 `八卦` 获取明星八卦
+* 发送 `XX热榜`（如 `微博热榜`、`知乎热榜`）获取相应平台的热榜
 
-  * `alapi_token`：填入申请的alapi token。
+## 示例
 
-  * `morning_news_text_enabled`：默认false，发送早报图片；true，发送文字版早报。
+* 发送 `一言` 获取随机名言
+* 发送 `白羊座` 获取白羊座今日运势
+* 发送 `北京天气` 获取北京今日天气
+* 发送 `北京明天天气` 获取北京明天天气
+* 发送 `北京七天天气` 获取北京七天天气预报
+* 发送 `体育新闻` 获取体育新闻头条
+* 发送 `毒鸡汤` 获取心灵毒鸡汤
+* 发送 `舔狗` 获取舔狗日记
+* 发送 `历史上的今天` 获取今天的历史事件
+* 发送 `早报` 获取每日早报
+* 发送 `摸鱼` 获取摸鱼人日历
 
-* docker部署：参考项目docker部署的[插件使用](https://github.com/zhayujie/chatgpt-on-wechat#3-%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8)，在挂载的config.json配置文件内增加`apilot`插件的配置参数，如下图，每次重启项目，需要使用 `#installp` 指令重新安装
+## 注意事项
 
-  <img src="img/docker参数.png" width="300" >
+* 部分功能需要配置 ALAPI 的 token 才能使用
+* 天气查询支持 3400+ 城市，输入不正确或查询失败会返回提示信息
+* 新闻查询支持 30+ 种新闻类别，包括综合、娱乐、体育、财经、科技等
+* 早报功能支持图片版和文字版，可在配置文件中设置
+* 摸鱼日历使用韩小韩API接口站，如果无法访问可能是因为该站点屏蔽了海外IP
 
-### Token申请
+## 功能依赖
 
-* `alapi_token`申请点击这里[alapi](https://admin.alapi.cn/account/center)
+* 天气查询、星座运势、新闻资讯、一言、毒鸡汤、舔狗日记、历史上的今天、早报：需要 ALAPI token
+* 摸鱼日历：使用韩小韩API接口站，免费无需token
 
-### 使用
-* 对话框发送"早报"、"摸鱼"、"微博热搜（已更新为"微博热榜）"、"任意星座名称"可以直接返回对应的内容！
+## 版本历史
 
-<img src="img/早报.png" width="600" >
-
-<img src="img/摸鱼.png" width="600" >
-
-<img src="img/星座.png" width="600" >
-
-<img src="img/微博热榜.png" width="600" >
-
-* 网易新闻查询：发送"新闻"获取综合新闻，或者发送特定类型如"体育新闻"、"科技新闻"等获取相应类别的新闻。支持30多种新闻类别，包括：综合、娱乐、体育、财经、科技、搞笑、游戏、读书、生活、直播、历史、国际、影视、国内足球、国际足球、篮球等。
-
-* 天气查询格式：城市+天气。如：成都天气。（支持3400+城市天气，输入不正确或者查询失败返回北京天气）
-
-<img src="img/天气.png" width="600" style="display: block; margin: auto;" />		
-
-* 热榜查询。支持:<微博/虎扑/知乎/哔哩哔哩/36氪/抖音/少数派/IT最新/IT科技>
-
-<img src="img/热榜.png" width="600" >
-
-* 还有其他功能请自行查看代码
-
-## 打赏支持
-
-如果您觉得这个插件对您有帮助，欢迎扫描下方二维码进行打赏支持，让我能够持续改进和开发更多实用功能。
-
-![微信打赏码](https://github.com/sofs2005/difytask/raw/main/img/wx.png?raw=true)
+* v1.5.0 - 添加触发词配置，完善所有功能
+* v1.4.0 - 适配 XXXBOT 框架
+* v1.3.0 - 添加更多 API 功能
+* v1.2.0 - 优化错误处理
+* v1.1.0 - 添加新闻查询功能
+* v1.0.0 - 初始版本

@@ -1,0 +1,75 @@
+[basic]
+# 是否启用插件
+enable = true
+# ALAPI的token，用于访问API服务
+alapi_token = ""
+# 是否启用早报文字版，true为文字版，false为图片版
+morning_news_text_enabled = false
+
+[triggers]
+# 天气查询触发正则表达式
+weather_pattern = '^(?:(.{2,7}?)(?:市|县|区|镇)?|(\d{7,9}))(:?今天|明天|后天|7天|七天)?(?:的)?天气$'
+# 星座运势触发正则表达式
+horoscope_pattern = '^([\u4e00-\u9fa5]{2}座)$'
+# 新闻查询触发正则表达式
+news_pattern = '^(.*?)新闻$'
+# 历史上的今天触发正则表达式
+history_pattern = '^历史上的今天(\d+)月(\d+)日'
+# 热榜查询触发正则表达式
+hot_trend_pattern = '(.{1,6})热榜$'
+# 一言触发词
+hitokoto_trigger = '一言'
+# 毒鸡汤触发词
+dujitang_trigger = '毒鸡汤'
+# 舔狗日记触发词
+dog_diary_trigger = '舔狗'
+# 早报触发词
+morning_news_trigger = '早报'
+# 摸鱼触发词
+moyu_trigger = '摸鱼'
+# 摸鱼视频触发词
+moyu_video_trigger = '摸鱼视频'
+# 八卦触发词
+bagua_trigger = '八卦'
+# 白丝图片触发词
+bstp_trigger = '白丝图片'
+# 黑丝图片触发词
+hstp_trigger = '黑丝图片'
+# 小姐姐视频触发词
+xjjsp_trigger = '小姐姐视频'
+# 玉足视频触发词
+yzsp_trigger = '玉足视频'
+# 黑丝视频触发词
+hssp_trigger = '黑丝视频'
+# cos视频触发词
+cos_trigger = 'cos视频'
+# 吊带视频触发词
+ddsp_trigger = '吊带视频'
+# JK视频触发词
+jksp_trigger = 'JK视频'
+# 萝莉视频触发词
+llsp_trigger = '萝莉视频'
+
+[apis]
+# 八卦API地址
+bagua_api_url = "https://dayu.qqsuu.cn/mingxingbagua/apis.php"
+# 摸鱼视频API地址
+moyu_video_api_url = "https://api.vvhan.com/api/360wallpaper"
+# 白丝图片API地址
+bstp_api_url = "https://api.xlb.one/api/baisi"
+# 黑丝图片API地址
+hstp_api_url = "https://api.xlb.one/api/heisi"
+# 小姐姐视频API地址
+xjjsp_api_url = "https://api.yujn.cn/api/zzxjj.php?type=json"
+# 玉足视频API地址
+yzsp_api_url = "http://www.yujn.cn/api/yuzu.php?type=json"
+# 黑丝视频API地址
+hssp_api_url = "https://api.yujn.cn/api/heisis.php?type=json"
+# cos视频API地址
+cos_api_url = "http://www.yujn.cn/api/COS.?type=json"
+# 吊带视频API地址
+ddsp_api_url = "http://www.yujn.cn/api/diaodai.php?type=json"
+# JK视频API地址
+jksp_api_url = "http://www.yujn.cn/api/jksp.php?type=json"
+# 萝莉视频API地址
+llsp_api_url = "http://www.yujn.cn/api/luoli.php?type=json"
