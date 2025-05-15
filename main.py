@@ -59,7 +59,7 @@ hitokoto_type_dict = {
 class Apilot(PluginBase):
     description = "从DOW迁移到XXX平台的插件"
     author = "sofs2005"
-    version = "2.0.0"
+    version = "2.0.1"
 
     def __init__(self):
         super().__init__()
@@ -264,15 +264,8 @@ class Apilot(PluginBase):
                 logger.info(f"[Apilot] Sending moyu video as video bytes, size: {len(moyu_video)} bytes")
                 await bot.send_video_message(from_wxid, moyu_video)
             elif self.is_valid_url(moyu_video):
-                logger.info(f"[Apilot] Sending moyu video as video card: {moyu_video}")
-                # 发送视频卡片
-                title = "摸鱼视频"
-                description = "今日摸鱼视频，快来摸鱼吧"
-                success = await self.send_video_card(bot, from_wxid, moyu_video, title, description)
-                if not success:
-                    # 如果发送卡片失败，回退到直接发送视频
-                    logger.info(f"[Apilot] Falling back to direct video URL: {moyu_video}")
-                    await bot.send_video_message(from_wxid, moyu_video)
+                logger.info(f"[Apilot] Sending moyu video as video URL: {moyu_video}")
+                await bot.send_video_message(from_wxid, moyu_video)
             else:
                 logger.info(f"[Apilot] Sending moyu video as text: {moyu_video}")
                 await bot.send_text_message(from_wxid, moyu_video)
@@ -345,15 +338,8 @@ class Apilot(PluginBase):
                 )
                 logger.info(f"[Apilot] Video sent successfully: client_msg_id={client_msg_id}, new_msg_id={new_msg_id}")
             elif self.is_valid_url(xjjsp):
-                logger.info(f"[Apilot] Sending xjjsp as video card: {xjjsp}")
-                # 发送视频卡片
-                title = "小姐姐视频"
-                description = "随机小姐姐视频，请欣赏"
-                success = await self.send_video_card(bot, from_wxid, xjjsp, title, description)
-                if not success:
-                    # 如果发送卡片失败，回退到直接发送视频
-                    logger.info(f"[Apilot] Falling back to direct video URL: {xjjsp}")
-                    await bot.send_video_message(from_wxid, xjjsp)
+                logger.info(f"[Apilot] Sending xjjsp as video URL: {xjjsp}")
+                await bot.send_video_message(from_wxid, xjjsp)
             else:
                 logger.info(f"[Apilot] Sending xjjsp as text: {xjjsp}")
                 await bot.send_text_message(from_wxid, xjjsp)
@@ -378,15 +364,8 @@ class Apilot(PluginBase):
                 )
                 logger.info(f"[Apilot] Video sent successfully: client_msg_id={client_msg_id}, new_msg_id={new_msg_id}")
             elif self.is_valid_url(yzsp):
-                logger.info(f"[Apilot] Sending yzsp as video card: {yzsp}")
-                # 发送视频卡片
-                title = "玉足视频"
-                description = "随机玉足视频，请欣赏"
-                success = await self.send_video_card(bot, from_wxid, yzsp, title, description)
-                if not success:
-                    # 如果发送卡片失败，回退到直接发送视频
-                    logger.info(f"[Apilot] Falling back to direct video URL: {yzsp}")
-                    await bot.send_video_message(from_wxid, yzsp)
+                logger.info(f"[Apilot] Sending yzsp as video URL: {yzsp}")
+                await bot.send_video_message(from_wxid, yzsp)
             else:
                 logger.info(f"[Apilot] Sending yzsp as text: {yzsp}")
                 await bot.send_text_message(from_wxid, yzsp)
@@ -411,15 +390,8 @@ class Apilot(PluginBase):
                 )
                 logger.info(f"[Apilot] Video sent successfully: client_msg_id={client_msg_id}, new_msg_id={new_msg_id}")
             elif self.is_valid_url(hssp):
-                logger.info(f"[Apilot] Sending hssp as video card: {hssp}")
-                # 发送视频卡片
-                title = "黑丝视频"
-                description = "随机黑丝视频，请欣赏"
-                success = await self.send_video_card(bot, from_wxid, hssp, title, description)
-                if not success:
-                    # 如果发送卡片失败，回退到直接发送视频
-                    logger.info(f"[Apilot] Falling back to direct video URL: {hssp}")
-                    await bot.send_video_message(from_wxid, hssp)
+                logger.info(f"[Apilot] Sending hssp as video URL: {hssp}")
+                await bot.send_video_message(from_wxid, hssp)
             else:
                 logger.info(f"[Apilot] Sending hssp as text: {hssp}")
                 await bot.send_text_message(from_wxid, hssp)
@@ -444,15 +416,8 @@ class Apilot(PluginBase):
                 )
                 logger.info(f"[Apilot] Video sent successfully: client_msg_id={client_msg_id}, new_msg_id={new_msg_id}")
             elif self.is_valid_url(cos):
-                logger.info(f"[Apilot] Sending cos as video card: {cos}")
-                # 发送视频卡片
-                title = "COS视频"
-                description = "随机COS视频，请欣赏"
-                success = await self.send_video_card(bot, from_wxid, cos, title, description)
-                if not success:
-                    # 如果发送卡片失败，回退到直接发送视频
-                    logger.info(f"[Apilot] Falling back to direct video URL: {cos}")
-                    await bot.send_video_message(from_wxid, cos)
+                logger.info(f"[Apilot] Sending cos as video URL: {cos}")
+                await bot.send_video_message(from_wxid, cos)
             else:
                 logger.info(f"[Apilot] Sending cos as text: {cos}")
                 await bot.send_text_message(from_wxid, cos)
@@ -477,15 +442,8 @@ class Apilot(PluginBase):
                 )
                 logger.info(f"[Apilot] Video sent successfully: client_msg_id={client_msg_id}, new_msg_id={new_msg_id}")
             elif self.is_valid_url(ddsp):
-                logger.info(f"[Apilot] Sending ddsp as video card: {ddsp}")
-                # 发送视频卡片
-                title = "吊带视频"
-                description = "随机吊带视频，请欣赏"
-                success = await self.send_video_card(bot, from_wxid, ddsp, title, description)
-                if not success:
-                    # 如果发送卡片失败，回退到直接发送视频
-                    logger.info(f"[Apilot] Falling back to direct video URL: {ddsp}")
-                    await bot.send_video_message(from_wxid, ddsp)
+                logger.info(f"[Apilot] Sending ddsp as video URL: {ddsp}")
+                await bot.send_video_message(from_wxid, ddsp)
             else:
                 logger.info(f"[Apilot] Sending ddsp as text: {ddsp}")
                 await bot.send_text_message(from_wxid, ddsp)
@@ -510,15 +468,8 @@ class Apilot(PluginBase):
                 )
                 logger.info(f"[Apilot] Video sent successfully: client_msg_id={client_msg_id}, new_msg_id={new_msg_id}")
             elif self.is_valid_url(jksp):
-                logger.info(f"[Apilot] Sending jksp as video card: {jksp}")
-                # 发送视频卡片
-                title = "JK视频"
-                description = "随机JK视频，请欣赏"
-                success = await self.send_video_card(bot, from_wxid, jksp, title, description)
-                if not success:
-                    # 如果发送卡片失败，回退到直接发送视频
-                    logger.info(f"[Apilot] Falling back to direct video URL: {jksp}")
-                    await bot.send_video_message(from_wxid, jksp)
+                logger.info(f"[Apilot] Sending jksp as video URL: {jksp}")
+                await bot.send_video_message(from_wxid, jksp)
             else:
                 logger.info(f"[Apilot] Sending jksp as text: {jksp}")
                 await bot.send_text_message(from_wxid, jksp)
@@ -543,15 +494,8 @@ class Apilot(PluginBase):
                 )
                 logger.info(f"[Apilot] Video sent successfully: client_msg_id={client_msg_id}, new_msg_id={new_msg_id}")
             elif self.is_valid_url(llsp):
-                logger.info(f"[Apilot] Sending llsp as video card: {llsp}")
-                # 发送视频卡片
-                title = "萝莉视频"
-                description = "随机萝莉视频，请欣赏"
-                success = await self.send_video_card(bot, from_wxid, llsp, title, description)
-                if not success:
-                    # 如果发送卡片失败，回退到直接发送视频
-                    logger.info(f"[Apilot] Falling back to direct video URL: {llsp}")
-                    await bot.send_video_message(from_wxid, llsp)
+                logger.info(f"[Apilot] Sending llsp as video URL: {llsp}")
+                await bot.send_video_message(from_wxid, llsp)
             else:
                 logger.info(f"[Apilot] Sending llsp as text: {llsp}")
                 await bot.send_text_message(from_wxid, llsp)
@@ -1724,9 +1668,41 @@ class Apilot(PluginBase):
         logger.info("[Apilot] Getting moyu calendar video")
         url = self.moyu_video_api_url
         try:
-            # 直接返回URL，用于卡片视频
-            logger.info(f"[Apilot] Returning moyu calendar video URL: {url}")
-            return url
+            logger.info(f"[Apilot] Making moyu calendar video request to {url}")
+            # 下载视频内容
+            try:
+                logger.info(f"[Apilot] Downloading moyu calendar video from {url}")
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'Accept': 'video/mp4,video/*;q=0.9,*/*;q=0.8',
+                    'Referer': 'https://api.vvhan.com/'
+                }
+
+                # 使用异步HTTP客户端
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url, headers=headers, timeout=30) as response:  # 视频可能较大，增加超时时间
+                        if response.status == 200:
+                            # 检查是否是视频内容
+                            content_type = response.headers.get('Content-Type', '')
+                            if 'video' in content_type or 'mp4' in content_type:
+                                video_data = await response.read()
+                                logger.info(f"[Apilot] Successfully downloaded moyu calendar video, size: {len(video_data)} bytes")
+                                # 返回视频字节
+                                return video_data
+                            else:
+                                logger.error(f"[Apilot] Moyu calendar video response is not a video: {content_type}")
+                                # 如果不是视频，返回URL
+                                return url
+                        else:
+                            logger.error(f"[Apilot] Failed to download moyu calendar video, status code: {response.status}")
+                            # 如果下载失败，返回URL
+                            logger.info(f"[Apilot] Falling back to returning URL: {url}")
+                            return url
+            except Exception as download_error:
+                logger.error(f"[Apilot] Failed to download moyu calendar video: {download_error}")
+                # 如果下载失败，返回URL
+                logger.info(f"[Apilot] Falling back to returning URL: {url}")
+                return url
         except Exception as e:
             logger.error(f"[Apilot] Exception in get_moyu_calendar_video: {str(e)}")
             logger.error(f"[Apilot] Exception traceback: {traceback.format_exc()}")
@@ -2050,70 +2026,7 @@ class Apilot(PluginBase):
             logger.error(f"[Apilot] Exception traceback: {traceback.format_exc()}")
             return f"获取黑丝图片时出错: {str(e)}"
 
-    async def send_video_card(self, bot, wxid, video_url, title, description="", thumb_url=None):
-        """Send a video card message"""
-        logger.info(f"[Apilot] Sending video card: {video_url}")
 
-        # 如果没有提供缩略图URL，使用默认图片
-        if not thumb_url:
-            thumb_url = "https://api.yujn.cn/static/images/logo.png"
-
-        try:
-            # 构造视频卡片XML
-            xml = f"""<appmsg appid="wx79f2c4418704b4f8" sdkver="0">
-<title>{title}</title>
-<des>{description}</des>
-<action>view</action>
-<type>5</type>
-<showtype>0</showtype>
-<content/>
-<url>{video_url}</url>
-<dataurl>{video_url}</dataurl>
-<lowurl>{video_url}</lowurl>
-<lowdataurl>{video_url}</lowdataurl>
-<recorditem/>
-<thumburl>{thumb_url}</thumburl>
-<messageaction/>
-<laninfo/>
-<extinfo/>
-<sourceusername/>
-<sourcedisplayname/>
-<commenturl/>
-<appattach>
-<totallen>0</totallen>
-<attachid/>
-<emoticonmd5/>
-<fileext/>
-<aeskey/>
-</appattach>
-<webviewshared>
-<publisherId/>
-<publisherReqId>0</publisherReqId>
-</webviewshared>
-<weappinfo>
-<pagepath/>
-<username/>
-<appid/>
-<appservicetype>0</appservicetype>
-</weappinfo>
-<websearch/>
-</appmsg>
-<fromusername>{bot.wxid}</fromusername>
-<scene>0</scene>
-<appinfo>
-<version>1</version>
-<appname/>
-</appinfo>
-<commenturl/>"""
-
-            # 发送视频卡片
-            await bot.send_app_message(wxid, xml, 5)
-            logger.info(f"[Apilot] Video card sent successfully")
-            return True
-        except Exception as e:
-            logger.error(f"[Apilot] Failed to send video card: {str(e)}")
-            logger.error(f"[Apilot] Exception traceback: {traceback.format_exc()}")
-            return False
 
     async def _get_video_with_cover(self, url, video_type, referer="https://api.yujn.cn/"):
         """Generic method to get videos with cover image"""
@@ -2347,71 +2260,30 @@ class Apilot(PluginBase):
             logger.error(f"[Apilot] Exception traceback: {traceback.format_exc()}")
             return f"获取{video_type}视频时出错: {str(e)}"
 
-    async def _get_video_url_only(self, url, video_type):
-        """Get only the video URL without downloading"""
-        logger.info(f"[Apilot] Getting {video_type} video URL only")
-        try:
-            # 首先尝试获取JSON数据
-            payload = "format=json"
-            headers = {'Content-Type': "application/x-www-form-urlencoded"}
-
-            # 使用requests库发送POST请求获取JSON数据
-            response = requests.post(url, headers=headers, data=payload)
-
-            if response.status_code == 200:
-                try:
-                    # 尝试解析JSON响应
-                    video_info = response.json()
-
-                    if isinstance(video_info, dict) and video_info.get('code') == 200:
-                        # 从JSON响应中提取视频URL
-                        video_url = video_info.get('data')
-
-                        if video_url and self.is_valid_url(video_url):
-                            logger.info(f"[Apilot] Successfully got {video_type} video URL: {video_url}")
-                            return video_url
-                        else:
-                            logger.error(f"[Apilot] Invalid video URL: {video_url}")
-                            return f"获取{video_type}视频失败，请稍后再试"
-                    else:
-                        logger.error(f"[Apilot] Invalid JSON response: {video_info}")
-                        return f"获取{video_type}视频失败，请稍后再试"
-                except ValueError:
-                    # 如果响应不是JSON，返回错误信息
-                    logger.error(f"[Apilot] Response is not JSON")
-                    return f"获取{video_type}视频失败，请稍后再试"
-            else:
-                logger.error(f"[Apilot] Failed to get {video_type} video info, status code: {response.status_code}")
-                return f"获取{video_type}视频失败，请稍后再试"
-        except Exception as e:
-            logger.error(f"[Apilot] Exception in get_{video_type}: {str(e)}")
-            logger.error(f"[Apilot] Exception traceback: {traceback.format_exc()}")
-            return f"获取{video_type}视频时出错: {str(e)}"
-
     async def get_xjjsp(self):
         """Get beautiful girl videos with cover image"""
-        return await self._get_video_url_only(self.xjjsp_api_url, "xjjsp")
+        return await self._get_video_with_cover(self.xjjsp_api_url, "xjjsp")
 
     async def get_yzsp(self):
         """Get foot videos with cover image"""
-        return await self._get_video_url_only(self.yzsp_api_url, "yzsp")
+        return await self._get_video_with_cover(self.yzsp_api_url, "yzsp")
 
     async def get_hssp(self):
         """Get black stockings videos with cover image"""
-        return await self._get_video_url_only(self.hssp_api_url, "hssp")
+        return await self._get_video_with_cover(self.hssp_api_url, "hssp")
 
     async def get_cos(self):
         """Get cosplay videos with cover image"""
-        return await self._get_video_url_only(self.cos_api_url, "cos")
+        return await self._get_video_with_cover(self.cos_api_url, "cos")
 
     async def get_ddsp(self):
         """Get suspender videos with cover image"""
-        return await self._get_video_url_only(self.ddsp_api_url, "ddsp")
+        return await self._get_video_with_cover(self.ddsp_api_url, "ddsp")
 
     async def get_jksp(self):
         """Get JK videos with cover image"""
-        return await self._get_video_url_only(self.jksp_api_url, "jksp")
+        return await self._get_video_with_cover(self.jksp_api_url, "jksp")
 
     async def get_llsp(self):
         """Get loli videos with cover image"""
-        return await self._get_video_url_only(self.llsp_api_url, "llsp")
+        return await self._get_video_with_cover(self.llsp_api_url, "llsp")
